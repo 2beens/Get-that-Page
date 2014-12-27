@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Quirks Mode". Replacing this declaration     -->
+<!-- with a "Standards Mode" doctype is supported, -->
+<!-- but may lead to some differences in layout.   -->
+
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="scripts/2been.js"></script>
+
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Get That Page!!!</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <h1 class="navbar-content">Get that page!</h1>
+    <img src="images/cable.png" />
+  </div>
+
+  <div class="main-container">
+    <p class="main-container-item" id="get-url-description">Enter the URL and press <span class="strong-text">return ⏎</span> to go!</p>
+    
+    <form class="main-container-item" action="getthatpage" id="url-form" method="get">
+      <div class="url-input-div">
+        <h3 class="url-input-item">URL:</h3>
+        <input class="url-input-item url-input" type="text" id="url-input" value="http://ftr.wot-news.com/" name="url-input"/>
+      </div>
+
+      <div id="div-radio-buttons">
+        <p class="radio-buttons-content">Open in: </p>
+        <input class="radio-buttons-content" type="radio" name="open-in-type" value="_self"> Page
+        <input class="radio-buttons-content" type="radio" name="open-in-type" value="_blank" checked> Tab
+        <input class="radio-buttons-content" type="radio" name="open-in-type" value="_top"> Window
+      </div>
+    </form>
+
+    <form class="main-container-item" action="getthatimage" id="image-url-form" method="get">
+      <div class="url-input-div">
+        <h3 class="url-input-item">IMAGE:</h3>
+        <input class="url-input-item url-input" type="text" id="image-url-input" value="http://tinyurl.com/oepbzrf" name="image-url-input"/>
+      </div>
+    </form>
+
+    <div class="main-container-item" id="div-cashed-sites">
+      <p class="div-cashed-sites-item">Cashed sites:</p>
+      <button class="div-cashed-sites-item btn" type="button" onclick="showCashedSitesAjax()">Get</button>
+      <div id="div-cashed-sites-list">
+
+      </div>
+    </div>
+
+    <div class="info main-container-item">
+      <h3>Some random crap here....</h3>
+      <p>Please, take notice that some cool web pages contain a lot of information, i.e. photos, text, styleesheets and scripts, so, when you post a request for it through this little pretty service, it might take some time for the page to display...hey, after all, it's still in delelopment, it's just a little child, give it some time, have some paitence, please! (or don't use it at all)</p>
+      <p>At this time, the proxy has some problems with photos and other links within, as well as sessions (which might never be implemented, since I don't think we need sessions at all!)</p>
+      <p>To be able to display images, I have to use low level Google Data Store API to store and display them, and since I'm not that patient to work with low level APIs, i need something more convenient, like Objectify (I've tried it on some of my previous projects...it's awesome! Saves a lot of time....<p>
+      <hr style="width: 90%;"/>
+      <p>To the left, I've added the "requests" part, anyone who is a user here may post a request for new features (I can only image what people would write here :)</p>
+      <hr style="width: 90%;"/>
+      <p>Some page interaction may not work, since I haven't yet implemented the proxy for JavaScript...</p>
+      <hr style="width: 90%;"/>
+      <p>Ability to display images is almost done. Still don't know how to display very large iamges (possibly storing it in fragments).</p>
+      <p>Proxy to javaScripts is still not done...</p>
+      <hr style="width: 90%;"/>
+      <p>24/dec/2014...JavaScript proxy almost done. JavaScript internal @Import is fucking me long time...</p>
+      <p>Maybe i can make another proxy, for images...hmmm...</p>
+    </div>
+
+    <br/>
+    <table class="main-container-item">
+      <tr>
+        <td colspan="2" style="font-weight:bold;">Links for testing:</td>        
+      </tr>
+      <tr>
+        <td><a href="#">GetThatPage</a></td>
+      </tr>
+      <tr>
+        <td><a href="/dummy.html">Dummy</a></td>
+      </tr>
+      <tr>
+      	<td><a href="/getdummy">Dummy [servlet]</a></td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div class="left-panel">
+    <div class="left-panel-item left-panel-heading">
+      <h3>Requests:</h3>
+    </div>
+    <p class="left-panel-item">No requests...</p>
+  </div>
+  
+  <div class="footer">
+    <hr/>
+    <p class="footer-content">Yet another simple proxy server. Still in development...</p>
+  </div>
+
+</body>
+</html>

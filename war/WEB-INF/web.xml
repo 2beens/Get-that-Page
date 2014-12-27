@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>GetThatPage</servlet-name>
+		<servlet-class>com.appspot.getthatpage.GetThatPageServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ImageServlet</servlet-name>
+		<servlet-class>com.appspot.getthatpage.ImageServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>GetCashedSites</servlet-name>
+		<servlet-class>com.appspot.getthatpage.GetCashedSites</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ScriptServlet</servlet-name>
+		<servlet-class>com.appspot.getthatpage.ScriptServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CssServlet</servlet-name>
+		<servlet-class>com.appspot.getthatpage.CssServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>GetThatImageServlet</servlet-name>
+		<servlet-class>com.appspot.getthatpage.GetThatImageServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>GetThatPage</servlet-name>
+		<url-pattern>/getthatpage</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ImageServlet</servlet-name>
+		<url-pattern>/image</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetCashedSites</servlet-name>
+		<url-pattern>/getcashedsites</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ScriptServlet</servlet-name>
+		<url-pattern>/script</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CssServlet</servlet-name>
+		<url-pattern>/css</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetThatImageServlet</servlet-name>
+		<url-pattern>/getthatimage</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	
+	<filter>
+        <filter-name>ObjectifyFilter</filter-name>
+        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	        <filter-name>ObjectifyFilter</filter-name>
+	        <url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>
