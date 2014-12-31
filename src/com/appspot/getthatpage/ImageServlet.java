@@ -62,10 +62,13 @@ public class ImageServlet extends HttpServlet {
 		
 		byte[] imgData = img.getBytes();
 		
-		if(url.toLowerCase().endsWith(".png"))
+		if(urlValidate.toLowerCase().endsWith(".png")){
 			resp.setContentType("image/png");
-		else
+		}else if(urlValidate.toLowerCase().endsWith(".jpg") || urlValidate.toLowerCase().endsWith(".jpeg")){
 			resp.setContentType("image/jpeg");
+		}else if(urlValidate.toLowerCase().endsWith(".bmp")){
+			resp.setContentType("image/bmp");
+		}
 		
 		resp.setContentLength(imgData.length);
 		

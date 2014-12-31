@@ -21,6 +21,17 @@ var main = function(){
     	$(this).attr('target', openInType);
     });
 
+    $('#dev-tools-link').click(function(event) {
+    	event.preventDefault();
+    	if($('#dev-tools-menu').hasClass('hidden')) {
+    		$('#dev-tools-menu').removeClass('hidden');
+    		$('#dev-tools-menu').fadeIn('fast');
+    	}else{
+    		$('#dev-tools-menu').addClass('hidden');
+    		$('#dev-tools-menu').fadeOut('fast');
+    	}
+    });
+
 	$("#url-input").autoGrowInput({minWidth:220,comfortZone:20});
 	$("#image-url-input").autoGrowInput({minWidth:200,comfortZone:20});
 

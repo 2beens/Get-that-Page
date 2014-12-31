@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 
 import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesServiceFactory;
 
 public class Utils {
 	public static final String URL_REGEX = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
@@ -146,8 +148,11 @@ public class Utils {
 		byte[] imageBytes = null;
 		
 		try {
-			is = url.openStream ();
+			is = url.openStream();
 			imageBytes = IOUtils.toByteArray(is);
+			
+			Image img = ImagesServiceFactory.makeImage(imageBytes);
+			System.out.println(String.format("---> Image received [%s] size [%d] [%s]", img.getFormat().name(), img.getImageData().length, url.toString()));
 		}
 		catch (IOException e) {
 			System.err.printf("Failed while reading bytes from %s: %s", url.toExternalForm(), e.getMessage());
@@ -168,12 +173,8 @@ public class Utils {
 		
 		try{
 			byte[] imgBytes = getImageBytesFromURL(new URL(imgSrc));
-			System.out.println("\t\tReceived img bytes: " + imgBytes.length);
-			
 			imgBlob = new Blob(imgBytes);			
-		}catch(Exception ex){
-			System.out.println("Cannot get image from src: " + imgSrc);
-			
+		}catch(Exception ex){			
 			if(ex.getClass().equals(IOException.class)) {
 				IOException ioEx = (IOException)ex;
 				System.out.println(ioEx.getMessage());

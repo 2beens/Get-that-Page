@@ -36,7 +36,49 @@ body a:hover {
 .navbar-content {
 	color: white;
 	font-style: normal;
-	padding-top: 8px;
+	display: inline;
+	
+}
+
+#dev-tools-link {
+	float: right;
+	margin-right: 20px;
+	margin-top: 20px;
+	padding: 3px;
+}
+
+#get-that-page-heading {
+	position: relative;
+	top: 10px;
+	left: 20px;
+}
+
+#dev-tools-menu {
+	float: right;
+	margin-top: 30px;
+	margin-right: 5px;
+	background-color: black;
+	border-radius: 10px;
+}
+
+.dev-tools-menu-hidden {
+	display: none;
+}
+
+.dev-tools-menu-item {	
+	border-radius: 5px;
+	-webkit-transition: all 0.3s ease-out;
+	   -moz-transition: all 0.3s ease-out;
+	    -ms-transition: all 0.3s ease-out;
+	     -o-transition: all 0.3s ease-out;
+		    transition: all 0.3s ease-out;
+	display: block;
+	margin: 12px;
+}
+
+.dev-tools-menu-item:focus {
+    border-color: #BBB;
+	outline: none;
 }
 
 /******************************** MAIN CONTENT *******************************/
@@ -131,7 +173,7 @@ body a:hover {
 	border-radius: 10px;
 	margin-left: 20%;
 	margin-right: 20%;
-	margin-top: 120px;
+	margin-top: 60px;
 
 	-webkit-box-shadow: 0px 0px 29px 0px rgba(51, 50, 50, 0.79);
 	   -moz-box-shadow: 0px 0px 29px 0px rgba(51, 50, 50, 0.79);
@@ -164,26 +206,29 @@ body a:hover {
 
 .left-panel {
 	float: left;
-	background-color: white;
-	position: absolute;
-	bottom: 55%;
-	margin-left: 10px;
-	min-height: 200px;
-	width: 330px;
+	background-color: white;	
 	border: 2px solid black;
 	border-radius: 10px;
 	padding: 5px;
+	height: 400px;
+	margin-left: 10px;
+
+	position: absolute;
+	bottom: 60%;
+	top: 20%;
+	overflow: auto;
 }
 
 .left-panel-heading {
 	color: white;
 	background-color: black;
-	position: relative;
-	top: -24px;
-	left: -5px;
-	width: 340px;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+}
+
+.left-panel-heading-item {
+	display: inline;
+	margin: 4px;
 }
 
 .left-panel-heading h3 {
