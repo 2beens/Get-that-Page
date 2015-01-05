@@ -156,7 +156,7 @@ public class Utils {
 		}
 		catch (IOException e) {
 			System.err.printf("Failed while reading bytes from %s: %s", url.toExternalForm(), e.getMessage());
-			e.printStackTrace ();
+			e.printStackTrace();
 		}
 		finally {
 			if (is != null) { 
@@ -167,13 +167,14 @@ public class Utils {
 		return imageBytes;
 	}
 
-
 	public static Blob getImageBlobByURL(String imgSrc) {
 		Blob imgBlob = null;
 		
 		try{
 			byte[] imgBytes = getImageBytesFromURL(new URL(imgSrc));
-			imgBlob = new Blob(imgBytes);			
+			
+			if(imgBytes != null)
+				imgBlob = new Blob(imgBytes);			
 		}catch(Exception ex){			
 			if(ex.getClass().equals(IOException.class)) {
 				IOException ioEx = (IOException)ex;
@@ -184,5 +185,39 @@ public class Utils {
 		}
 		
 		return imgBlob;
+	}
+	
+	public static ArrayList<String> getBackgroundImagesURLsFromSource(String originalSource) {
+		ArrayList<String> imgUrls = new ArrayList<String>();
+		String source = originalSource.replaceAll("\\s+", "").toLowerCase();
+		
+		String imgString = "background-image:url(";
+		int imgStringLen = imgString.length();
+		
+		int imgStringBeginIndex = -1;
+		int imgStringEndIndex = -1;
+		for(int i = 0; i < source.length() - imgStringLen; i++){		
+			char[] styleChars = new char[imgStringLen];
+			source.getChars(i, i + imgStringLen, styleChars, 0);
+			
+			String bImg = new String(styleChars);
+			if(bImg.equals(imgString)) {
+				imgStringBeginIndex = i + imgStringLen;
+			}else if(imgStringBeginIndex > 0){
+				if(bImg.startsWith("')")) {
+					imgStringEndIndex = i;
+				}else if(bImg.endsWith("')")) {
+					imgStringEndIndex = i + imgStringLen - 1;
+				}
+				
+				if(imgStringEndIndex > 0) {
+					imgUrls.add(source.substring(imgStringBeginIndex + 1, imgStringEndIndex - 1));
+					imgStringBeginIndex = -1;
+					imgStringEndIndex = -1;
+				}
+			}
+		}
+		
+		return imgUrls;
 	}
 }

@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Blob;
 
-import entities.ClonedWebSite;
-import entities.ClonedWebSiteController;
+import com.appspot.getthatpage.entities.ClonedWebSite;
+import com.appspot.getthatpage.entities.ClonedWebSiteController;
 
 @SuppressWarnings("serial")
 public class ImageServlet extends HttpServlet {

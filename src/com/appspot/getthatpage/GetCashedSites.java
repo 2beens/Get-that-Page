@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import entities.ClonedWebSite;
-import entities.ClonedWebSiteController;
+import com.appspot.getthatpage.entities.ClonedWebSite;
+import com.appspot.getthatpage.entities.ClonedWebSiteController;
 
 @SuppressWarnings("serial")
 public class GetCashedSites extends HttpServlet{

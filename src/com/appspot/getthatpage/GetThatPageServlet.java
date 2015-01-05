@@ -15,13 +15,16 @@ import javax.servlet.http.*;
 
 import com.google.appengine.api.datastore.Blob;
 
-import conf.OfyService;
-import entities.ClonedWebSite;
-import entities.ClonedWebSiteController;
+import com.appspot.getthatpage.conf.OfyService;
+import com.appspot.getthatpage.entities.ClonedWebSite;
+import com.appspot.getthatpage.entities.ClonedWebSiteController;
 
 @SuppressWarnings("serial")
 public class GetThatPageServlet extends HttpServlet {
 
+	//TODO: umjesto ovakvog "strukturalnog" pristupa, mogao sam pristupiti na vise OOP nacin razmisljanja
+	//		da se napravi klasa "Site" koja kroz constr prima HTML i sve se tu izdesava, i samo se ekstraktuju delovi sajta
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		try {
@@ -70,20 +73,17 @@ public class GetThatPageServlet extends HttpServlet {
 					img2src.add(src);
 			}
 
-			//TODO: get images from CSSs
-
-
 			//get webSite object and find its images
 			ClonedWebSite site = ClonedWebSiteController.getClonedWebSite(hostName);
 			HashSet<String> falseImageURLs = new HashSet<String>();
 			if(site != null){
 				//get existing site Blob images and insert new ones
-				boolean newImagesAdded = false;
+				//boolean newImagesAdded = false;
 				for (String imgSrc : img2src) {
 					if(site.hasImageBlob(imgSrc))
 						continue;
 
-					newImagesAdded = true;
+					//newImagesAdded = true;
 
 					//add new image
 					String fullImgUrl = imgSrc.toString();
@@ -95,13 +95,18 @@ public class GetThatPageServlet extends HttpServlet {
 					}
 
 					Blob imgBlob = Utils.getImageBlobByURL(fullImgUrl);
-					if(imgBlob != null && imgBlob.getBytes().length < 1000000) {
+					
+					if(imgBlob == null)
+						continue;
+					
+					if(imgBlob.getBytes().length < 1000000) {
 						site.addImageBlob(imgSrc, imgBlob);
 					}else{
 						falseImageURLs.add(imgSrc);
 					}
 				}
 
+				/*
 				if(newImagesAdded) {
 					try{
 						ClonedWebSiteController.saveClonedWebSite(site);
@@ -110,6 +115,7 @@ public class GetThatPageServlet extends HttpServlet {
 						System.out.println(ex.getMessage());
 					}
 				}
+				*/
 			}else{
 				//get Blobs images from URLs and store them in new webSite object
 				//then save new webSite object
@@ -135,6 +141,26 @@ public class GetThatPageServlet extends HttpServlet {
 				site = new ClonedWebSite(hostName, url2imageMap);			
 			}
 
+			//TODO: get images from CSSs and HEAD
+			ArrayList<String> backgroundImagesFromHead = Utils.getBackgroundImagesURLsFromSource(head);
+			for(String backImageSrc : backgroundImagesFromHead) {
+				if(site.hasImageBlob(backImageSrc))
+					continue;
+				
+				String fullImgUrl = backImageSrc.toString();
+				if(!fullImgUrl.toLowerCase().startsWith("http")) {
+					if(!fullImgUrl.startsWith("/"))
+						fullImgUrl = "/" + fullImgUrl;
+
+					fullImgUrl = "http://" + hostName + fullImgUrl;
+				}
+
+				Blob imgBlob = Utils.getImageBlobByURL(fullImgUrl);
+				if(imgBlob.getBytes().length < 1000000) {
+					site.addImageBlob(backImageSrc, imgBlob);
+				}
+			}
+			
 			//get javaScripts
 			ArrayList<String> scriptTags = Utils.getTagsFromHtml("script", sbHtmlString.toString());
 			for(String scriptTag : scriptTags) {
@@ -205,6 +231,11 @@ public class GetThatPageServlet extends HttpServlet {
 				String newSrc = String.format("http://%s/image?host=%s&url=%s", serverHostName, hostName, src);			
 				html = html.replace(src, newSrc);
 			}
+			
+			for(String backImgSrc : backgroundImagesFromHead) {
+				String newSrc = String.format("http://%s/image?host=%s&url=%s", serverHostName, hostName, backImgSrc);			
+				html = html.replace(backImgSrc, newSrc);
+			}
 
 			sbHtmlString = new StringBuilder(html);
 
@@ -215,7 +246,12 @@ public class GetThatPageServlet extends HttpServlet {
 			resp.getWriter().println(sbHtmlString.toString());
 			
 		}catch(Exception ex) {
-			req.getSession().setAttribute("ex", ex.getMessage());
+			String exMessage = ex.getMessage() + "<br/>";
+			for(StackTraceElement ste : ex.getStackTrace()) {
+				exMessage += "at " + ste.getLineNumber() + ", " + ste.getFileName() + " > " + ste.getMethodName() + "<br/>";
+			}
+			
+			req.getSession().setAttribute("ex", exMessage);
 			resp.sendRedirect("/errorPage.jsp");
 		}
 	}
