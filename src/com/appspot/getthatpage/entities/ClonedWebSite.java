@@ -27,7 +27,15 @@ public class ClonedWebSite {
 	
 	HashMap<String, Ref<ClonedStringContent>> url2cssMap;
 
+	//app engine required no-arg constructor
 	public ClonedWebSite() { 
+		this.url2imageMap = new HashMap<String, Ref<ClonedImage>>();
+		this.url2scriptMap = new HashMap<String, Ref<ClonedStringContent>>();
+		this.url2cssMap = new HashMap<String, Ref<ClonedStringContent>>();
+	}
+	
+	public ClonedWebSite(String hostName) { 
+		this.hostName = hostName;
 		this.url2imageMap = new HashMap<String, Ref<ClonedImage>>();
 		this.url2scriptMap = new HashMap<String, Ref<ClonedStringContent>>();
 		this.url2cssMap = new HashMap<String, Ref<ClonedStringContent>>();
@@ -50,6 +58,16 @@ public class ClonedWebSite {
 		for (Map.Entry<String, ClonedImage> entry : clonedImagesToSave.entrySet()) {
 			this.url2imageMap.put(entry.getKey(), Ref.create(entry.getValue()));
 		}
+	}
+	
+	public HashMap<String, Blob> getUrl2ImageMap() {
+		HashMap<String, Blob> url2ImageMap = new HashMap<String, Blob>();
+		
+		for (Map.Entry<String, Ref<ClonedImage>> entry : url2imageMap.entrySet()) {
+			url2ImageMap.put(entry.getKey(), entry.getValue().get().imageBlob);
+		}
+		
+		return url2ImageMap;
 	}
 	
 	public Set<Entry<String, String>> getUrl2ScriptEntrySet() {
@@ -93,7 +111,7 @@ public class ClonedWebSite {
 		OfyService.ofy().save().entity(scriptContent).now();
 		
 		this.url2scriptMap.put(scriptUrl, Ref.create(scriptContent));
-		OfyService.ofy().save().entity(this).now();
+		//OfyService.ofy().save().entity(this).now();
 	}
 
 	public void addNewCss(String cssUrl, String css) {
@@ -101,7 +119,15 @@ public class ClonedWebSite {
 		OfyService.ofy().save().entity(cssContent).now();
 		
 		this.url2cssMap.put(cssUrl, Ref.create(cssContent));
-		OfyService.ofy().save().entity(this).now();
+		//OfyService.ofy().save().entity(this).now();
+	}
+
+	public void addImageBlob(String url, Blob imgBlob) {
+		ClonedImage ci = new ClonedImage(imgBlob);
+		OfyService.ofy().save().entity(ci).now();
+		
+		url2imageMap.put(url, Ref.create(ci));
+		//OfyService.ofy().save().entity(this).now();
 	}
 	
 	public int getNumberOfScripts() {
@@ -112,27 +138,8 @@ public class ClonedWebSite {
 		return this.hostName;
 	}
 
-	public HashMap<String, Blob> getUrl2ImageMap() {
-		HashMap<String, Blob> url2ImageMap = new HashMap<String, Blob>();
-		
-		for (Map.Entry<String, Ref<ClonedImage>> entry : url2imageMap.entrySet()) {
-			url2ImageMap.put(entry.getKey(), entry.getValue().get().imageBlob);
-		}
-		
-		return url2ImageMap;
-	}
-	
 	public boolean hasImageBlob(String url) {
 		return url2imageMap.containsKey(url);
-	}
-	
-	public void addImageBlob(String url, Blob imgBlob) {
-		ClonedImage ci = new ClonedImage(imgBlob);
-		OfyService.ofy().save().entity(ci).now();
-		
-		url2imageMap.put(url, Ref.create(ci));
-		
-		OfyService.ofy().save().entity(this).now();
 	}
 	
 	public Blob getImageBlob(String url){
@@ -141,29 +148,5 @@ public class ClonedWebSite {
 		}
 		
 		return null;
-	}
-	
-	/*
-	public void saveAllData() {
-		ArrayList<ClonedImage> clonedImages = new ArrayList<ClonedImage>();
-		for (Map.Entry<String, Ref<ClonedImage>> entry : url2imageMap.entrySet()) {
-			clonedImages.add(entry.getValue().get());
-		}
-		OfyService.ofy().save().entities(clonedImages).now();
-		
-		ArrayList<ClonedStringContent> clonedScripts = new ArrayList<ClonedStringContent>();
-		for(Map.Entry<String, Ref<ClonedStringContent>> entry : url2scriptMap.entrySet()) {
-			clonedScripts.add(entry.getValue().get());
-		}
-		OfyService.ofy().save().entities(clonedScripts).now();
-		
-		ArrayList<ClonedStringContent> clonedStylesheets = new ArrayList<ClonedStringContent>();
-		for(Map.Entry<String, Ref<ClonedStringContent>> entry : url2cssMap.entrySet()) {
-			clonedStylesheets.add(entry.getValue().get());
-		}
-		OfyService.ofy().save().entities(clonedStylesheets).now();
-		
-		OfyService.ofy().save().entity(this).now();
-	}
-	*/
+	}	
 }

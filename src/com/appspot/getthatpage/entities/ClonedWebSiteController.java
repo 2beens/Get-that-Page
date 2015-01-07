@@ -9,11 +9,16 @@ import com.googlecode.objectify.Key;
 public class ClonedWebSiteController {
 	
 	public static ClonedWebSite getClonedWebSite(String hostName){
-		return ofy().load().type(ClonedWebSite.class).filter("hostName", hostName).first().now();
+		ClonedWebSite site = ofy().load().type(ClonedWebSite.class).filter("hostName", hostName).first().now();
+		
+		if(site == null) {
+			site = new ClonedWebSite(hostName);
+		}
+		
+		return site;
 	}
 	
 	public static List<ClonedWebSite> getAllClonedWebSites() {
-		//ArrayList<ClonedWebSite> clonedWebSites = new ArrayList<ClonedWebSite>();
 		return ofy().load().type(ClonedWebSite.class).list();
 	}
 	

@@ -1,4 +1,7 @@
 var main = function(){	
+
+	//////// SITE AND IMAGE INPUT BOXES ////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 	$("#url-input").keypress(function(event) {
 		if(event.which === 13){
 			var urlInput = $(this).val();
@@ -21,6 +24,8 @@ var main = function(){
     	$(this).attr('target', openInType);
     });
 
+    //////// DEV TOOLS LINK ////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     $('#dev-tools-link').click(function(event) {
     	event.preventDefault();
     	if($('#dev-tools-menu').hasClass('hidden')) {
@@ -32,10 +37,26 @@ var main = function(){
     	}
     });
 
+    //////// USE JSoup DIV BUTTON //////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    $('#use-jsoup-div').click(function(event) {
+    	if($(this).hasClass('use-jsoup-div-selected')) {
+    		$(this).removeClass('use-jsoup-div-selected');
+    		$('#url-form').attr('action', 'getthatpage');
+    	}else{
+    		$(this).addClass('use-jsoup-div-selected');
+    		$('#url-form').attr('action', 'getjsoupage');
+    	}
+    });
+
+    //////// AUTO GROW INPUT BOXES /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 	$("#url-input").autoGrowInput({minWidth:220,comfortZone:20});
 	$("#image-url-input").autoGrowInput({minWidth:200,comfortZone:20});
 
-	setInterval(showCashedSitesAjax, 20000);
+	//////// GET CACHED SITES AJAX /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+	//setInterval(showCashedSitesAjax, 20000);
 };
 
 function showCashedSitesAjax() {

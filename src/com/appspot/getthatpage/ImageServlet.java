@@ -37,7 +37,7 @@ public class ImageServlet extends HttpServlet {
 			urlValidate = "http://" + host + urlValidate;
 		}
 		
-		if(!Utils.isValidUrl(urlValidate)){
+		if(!Utils.isSiteUrlValid(urlValidate)){
 			System.out.println("GET IMAGE ERROR: image url not valid: " + urlValidate);
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;

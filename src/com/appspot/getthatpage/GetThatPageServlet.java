@@ -1,13 +1,8 @@
 package com.appspot.getthatpage;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -34,8 +29,7 @@ public class GetThatPageServlet extends HttpServlet {
 			}
 
 			String urlString = req.getParameter("url-input");
-			if(!Utils.isValidUrl(urlString)){
-				//resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			if(!Utils.isSiteUrlValid(urlString)){
 				req.getSession().setAttribute("ex", "HttpServletResponse.SC_BAD_REQUEST");
 				resp.sendRedirect("/errorPage.jsp");
 				return;
@@ -45,16 +39,20 @@ public class GetThatPageServlet extends HttpServlet {
 			String hostName = url.getHost();
 
 			if(serverHostName.toLowerCase().equals(hostName.toLowerCase())) {
-				resp.sendError(HttpServletResponse.SC_CONFLICT);
+				req.getSession().setAttribute("ex", "HttpServletResponse.SC_CONFLICT");
+				resp.sendRedirect("/errorPage.jsp");
 				return;
 			}
 
 			//get html string
-			String htmlString = getResponseStringFromURL(url);
+			String htmlString = Utils.getResponseStringFromURL(url);
 			StringBuilder sbHtmlString = new StringBuilder(htmlString);
 
 			String head = Utils.getHtmlHeadPart(sbHtmlString.toString());
 
+			//get webSite object and find its images
+			ClonedWebSite site = ClonedWebSiteController.getClonedWebSite(hostName);
+			
 			//search for IMG tags and store their URLs
 			ArrayList<String> imgTags = Utils.getTagsFromHtml("img", sbHtmlString.toString());
 			ArrayList<String> img2src = new ArrayList<String>();
@@ -69,79 +67,38 @@ public class GetThatPageServlet extends HttpServlet {
 					srcValidation = "http://" + hostName + srcValidation;
 				}
 
-				if(Utils.isValidUrl(srcValidation))
+				if(Utils.isSiteUrlValid(srcValidation))
 					img2src.add(src);
 			}
 
-			//get webSite object and find its images
-			ClonedWebSite site = ClonedWebSiteController.getClonedWebSite(hostName);
+			//get existing site Blob images and insert new ones
 			HashSet<String> falseImageURLs = new HashSet<String>();
-			if(site != null){
-				//get existing site Blob images and insert new ones
-				//boolean newImagesAdded = false;
-				for (String imgSrc : img2src) {
-					if(site.hasImageBlob(imgSrc))
-						continue;
+			for (String imgSrc : img2src) {
+				if(site.hasImageBlob(imgSrc))
+					continue;
 
-					//newImagesAdded = true;
+				//add new image
+				String fullImgUrl = imgSrc.toString();
+				if(!fullImgUrl.toLowerCase().startsWith("http")) {
+					if(!fullImgUrl.startsWith("/"))
+						fullImgUrl = "/" + fullImgUrl;
 
-					//add new image
-					String fullImgUrl = imgSrc.toString();
-					if(!fullImgUrl.toLowerCase().startsWith("http")) {
-						if(!fullImgUrl.startsWith("/"))
-							fullImgUrl = "/" + fullImgUrl;
-
-						fullImgUrl = "http://" + hostName + fullImgUrl;
-					}
-
-					Blob imgBlob = Utils.getImageBlobByURL(fullImgUrl);
-					
-					if(imgBlob == null)
-						continue;
-					
-					if(imgBlob.getBytes().length < 1000000) {
-						site.addImageBlob(imgSrc, imgBlob);
-					}else{
-						falseImageURLs.add(imgSrc);
-					}
+					fullImgUrl = "http://" + hostName + fullImgUrl;
 				}
 
-				/*
-				if(newImagesAdded) {
-					try{
-						ClonedWebSiteController.saveClonedWebSite(site);
-					}catch(Exception ex){
-						System.out.println(" >>> NEW IMAGES ARE NOT SAVED FOR: " + hostName);					
-						System.out.println(ex.getMessage());
-					}
+				Blob imgBlob = Utils.getImageBlobByURL(fullImgUrl);
+				
+				if(imgBlob == null)
+					continue;
+				
+				if(imgBlob.getBytes().length < 1000000) {
+					site.addImageBlob(imgSrc, imgBlob);
+				}else{
+					falseImageURLs.add(imgSrc);
 				}
-				*/
-			}else{
-				//get Blobs images from URLs and store them in new webSite object
-				//then save new webSite object
-				HashMap<String, Blob> url2imageMap = new HashMap<String, Blob>();
-
-				for (String imgSrc : img2src) {
-					String fullImgUrl = imgSrc.toString();
-					if(!fullImgUrl.toLowerCase().startsWith("http")) {
-						if(!fullImgUrl.startsWith("/"))
-							fullImgUrl = "/" + fullImgUrl;
-
-						fullImgUrl = "http://" + hostName + fullImgUrl;
-					}
-
-					Blob img = Utils.getImageBlobByURL(fullImgUrl);
-					if(img != null && img.getBytes().length < 1000000) {
-						url2imageMap.put(imgSrc, img);
-					}else{
-						falseImageURLs.add(imgSrc);
-					}
-				}
-
-				site = new ClonedWebSite(hostName, url2imageMap);			
 			}
 
-			//TODO: get images from CSSs and HEAD
+			//get images from internal CSSs
 			ArrayList<String> backgroundImagesFromHead = Utils.getBackgroundImagesURLsFromSource(head);
 			for(String backImageSrc : backgroundImagesFromHead) {
 				if(site.hasImageBlob(backImageSrc))
@@ -156,10 +113,13 @@ public class GetThatPageServlet extends HttpServlet {
 				}
 
 				Blob imgBlob = Utils.getImageBlobByURL(fullImgUrl);
-				if(imgBlob.getBytes().length < 1000000) {
+				if(imgBlob != null && imgBlob.getBytes().length < 1000000) {
 					site.addImageBlob(backImageSrc, imgBlob);
 				}
 			}
+			
+			//TODO: get images from external CSSs
+			
 			
 			//get javaScripts
 			ArrayList<String> scriptTags = Utils.getTagsFromHtml("script", sbHtmlString.toString());
@@ -176,7 +136,7 @@ public class GetThatPageServlet extends HttpServlet {
 					srcWithHostname = "http://" + hostName + srcWithHostname;
 
 				try{
-					String script = getResponseStringFromURLString(srcWithHostname);
+					String script = Utils.getResponseStringFromURLString(srcWithHostname);
 					site.addNewScript(scriptUrl, script);
 				}catch(Exception ex) {
 					System.out.println("Cannot download script: " + scriptUrl);
@@ -195,19 +155,18 @@ public class GetThatPageServlet extends HttpServlet {
 					cssUrlWithHostName = "http://" + hostName + "/" + cssUrl;
 
 				try{
-					String css = getResponseStringFromURLString(cssUrlWithHostName);
+					String css = Utils.getResponseStringFromURLString(cssUrlWithHostName);
 					site.addNewCss(cssUrl, css);
 				}catch(Exception ex) {
 					System.out.println("Cannot download css: " + cssUrl);
 				}
 			}
-
+			
 			//////////////////////////////////////////////////////////////////////////////////////		
 			//////////////////      store new site version           /////////////////////////////
 			//////////////////////////////////////////////////////////////////////////////////////
 			OfyService.ofy().save().entity(site).now();
-			//site.saveAllData();
-
+			
 			//fix javaScript URLs
 			String html = sbHtmlString.toString();
 			for (Map.Entry<String, String> entry : site.getUrl2ScriptEntrySet()) {
@@ -248,7 +207,7 @@ public class GetThatPageServlet extends HttpServlet {
 		}catch(Exception ex) {
 			String exMessage = ex.getMessage() + "<br/>";
 			for(StackTraceElement ste : ex.getStackTrace()) {
-				exMessage += "at " + ste.getLineNumber() + ", " + ste.getFileName() + " > " + ste.getMethodName() + "<br/>";
+				exMessage += "at " + ste.getLineNumber() + ",\t" + ste.getFileName() + " >\t" + ste.getMethodName() + "<br/>";
 			}
 			
 			req.getSession().setAttribute("ex", exMessage);
@@ -267,45 +226,25 @@ public class GetThatPageServlet extends HttpServlet {
 			sbHtmlString.getChars(i, i + aTagLength, tagChars, 0);
 
 			String tagStr = new String(tagChars).toLowerCase();
-			if(tagStr.equals(aTag)){
-				//<a tag found
-				for(int j = i + aTagLength; j < sbHtmlString.length() - 5; j++){					
-					char[] hrefChars = new char[6];
-					sbHtmlString.getChars(j, j + 6, hrefChars, 0);
-					String hrefStr = new String(hrefChars).toLowerCase();
+			if(!tagStr.equals(aTag))
+				continue;
+				
+			//<a tag found
+			for(int j = i + aTagLength; j < sbHtmlString.length() - 5; j++){					
+				char[] hrefChars = new char[6];
+				sbHtmlString.getChars(j, j + 6, hrefChars, 0);
+				String hrefStr = new String(hrefChars).toLowerCase();
 
-					if(hrefStr.equals("href=\"") || hrefStr.equals("\'")){
-						String hrefValue = sbHtmlString.substring(j + 6, j + 6 + fullServerHostName.length());
+				if(hrefStr.equals("href=\"") || hrefStr.equals("\'")){
+					String hrefValue = sbHtmlString.substring(j + 6, j + 6 + fullServerHostName.length());
 
-						//if this "<a href" value already stards with my servers URL, dont replace it
-						if(!hrefValue.startsWith(fullServerHostName)) {
-							sbHtmlString.insert(j + 6, fullServerHostName + "/getthatpage?url-input=");
-							break; //this <a tag is fixed, move on to next ones
-						}
+					//if this "<a href" value already stards with my servers URL, dont replace it
+					if(!hrefValue.startsWith(fullServerHostName)) {
+						sbHtmlString.insert(j + 6, fullServerHostName + "/getthatpage?url-input=");
+						break; //this <a tag is fixed, move on to next ones
 					}
 				}
 			}
 		}
-	}
-
-	private String getResponseStringFromURLString(String urlString) throws MalformedURLException, IOException{
-		return getResponseStringFromURL(new URL(urlString));
-	}
-
-	private String getResponseStringFromURL(URL url) throws MalformedURLException, IOException{
-		URLConnection urlConnection = url.openConnection();
-		BufferedReader urlReader = new BufferedReader(
-				new InputStreamReader(
-						urlConnection.getInputStream(), "UTF-8"));
-
-		StringBuilder sbHtml = new StringBuilder();
-		String htmlLine;
-		while ((htmlLine = urlReader.readLine()) != null){ 
-			sbHtml.append(htmlLine + "\n");
-		}
-
-		urlReader.close();
-
-		return sbHtml.toString();
 	}
 }

@@ -1,8 +1,13 @@
 package com.appspot.getthatpage;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +22,7 @@ public class Utils {
 	public static final String URL_REGEX = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 	public static Pattern urlValidationPattern = null;
 	
-	public static boolean isValidUrl(String url){
+	public static boolean isSiteUrlValid(String url){
 		if(urlValidationPattern == null){
 			urlValidationPattern = Pattern.compile(URL_REGEX);
 		}
@@ -25,6 +30,21 @@ public class Utils {
 	    Matcher m = urlValidationPattern.matcher(url); 
 	    
 	    return m.find();
+	}
+	
+	public static boolean isGenericURLValid(String url) {
+		boolean isValid = false;
+		
+		try {
+			URL urlObj = new URL(url);
+			urlObj.toURI();
+			
+			isValid = true;
+		} catch (MalformedURLException | URISyntaxException e) {
+			System.out.println("Not a valid generic url: " + url);
+		}
+		
+		return isValid;
 	}
 	
 	public static ArrayList<String> getStylesheetUrlsFromLinks(ArrayList<String> links){
@@ -219,5 +239,26 @@ public class Utils {
 		}
 		
 		return imgUrls;
+	}
+	
+	public static String getResponseStringFromURLString(String urlString) throws MalformedURLException, IOException{
+		return getResponseStringFromURL(new URL(urlString));
+	}
+
+	public static String getResponseStringFromURL(URL url) throws MalformedURLException, IOException{
+		URLConnection urlConnection = url.openConnection();
+		BufferedReader urlReader = new BufferedReader(
+				new InputStreamReader(
+						urlConnection.getInputStream(), "UTF-8"));
+
+		StringBuilder sbHtml = new StringBuilder();
+		String htmlLine;
+		while ((htmlLine = urlReader.readLine()) != null){ 
+			sbHtml.append(htmlLine + "\n");
+		}
+
+		urlReader.close();
+
+		return sbHtml.toString();
 	}
 }

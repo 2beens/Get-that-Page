@@ -34,7 +34,7 @@ public class CssServlet extends HttpServlet {
 			urlValidate = "http://" + host + urlValidate;
 		}
 		
-		if(!Utils.isValidUrl(urlValidate)){
+		if(!Utils.isSiteUrlValid(urlValidate)){
 			System.out.println("GET CSS ERROR: css url not valid: " + urlValidate);
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;

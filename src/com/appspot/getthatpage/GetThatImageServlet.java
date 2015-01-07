@@ -21,7 +21,7 @@ public class GetThatImageServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		String urlString = req.getParameter("image-url-input");
-		if(urlString == null || !Utils.isValidUrl(urlString)){
+		if(urlString == null || !Utils.isSiteUrlValid(urlString)){
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}

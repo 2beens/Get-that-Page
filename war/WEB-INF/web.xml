@@ -28,10 +28,22 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>GetThatImageServlet</servlet-name>
 		<servlet-class>com.appspot.getthatpage.GetThatImageServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>GetThatPageViaJsoupServlet</servlet-name>
+		<servlet-class>com.appspot.getthatpage.GetThatPageViaJsoupServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>DeleteAllCachedContent</servlet-name>
+		<servlet-class>com.appspot.getthatpage.DeleteAllCachedContent</servlet-class>
+	</servlet>
 	
 	<servlet-mapping>
 		<servlet-name>GetThatPage</servlet-name>
 		<url-pattern>/getthatpage</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetThatPageViaJsoupServlet</servlet-name>
+		<url-pattern>/getjsoupage</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ImageServlet</servlet-name>
@@ -52,6 +64,10 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<servlet-mapping>
 		<servlet-name>GetThatImageServlet</servlet-name>
 		<url-pattern>/getthatimage</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DeleteAllCachedContent</servlet-name>
+		<url-pattern>/deletecached</url-pattern>
 	</servlet-mapping>
 	
 	<welcome-file-list>
